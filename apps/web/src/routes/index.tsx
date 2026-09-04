@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { productDescription } from "@spaceobject/core";
 import { ThemeToggle } from "@spaceobject/ui/components/theme-toggle";
 
@@ -10,9 +10,9 @@ function Home() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-6 sm:px-10 sm:py-8">
       <header className="flex items-center justify-between border-b border-border pb-6">
-        <a className="font-serif text-xl font-semibold tracking-tight" href="/">
+        <Link className="font-serif text-xl font-semibold tracking-tight" to="/">
           Space Object
-        </a>
+        </Link>
         <ThemeToggle />
       </header>
 
