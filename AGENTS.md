@@ -25,3 +25,17 @@ release. Add a tool name to select part of the graph. For example, run
 - [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
 
 <!--VITE PLUS END-->
+
+## Agent skills
+
+### Issue tracker
+
+Issues are tracked in the `spaceobject-ai/v1` GitHub repository. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Use the five default canonical triage labels. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This is a multi-context repository. See `docs/agents/domain.md`.
