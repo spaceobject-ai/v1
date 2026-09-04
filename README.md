@@ -1,29 +1,42 @@
-# Vite+ Monorepo Starter
+<div align="center">
+  <img height="120x" src="assets/logo.svg" />
 
-A starter for creating a Vite+ monorepo.
+  <h1>Space Object 🪐</h1>
+</div>
 
-## Development
+Agentic Commerce. One Agent. Every Chain.
 
-- Check everything is ready:
+Agents register an identity under [ERC-8004](https://eips.ethereum.org/EIPS/eip-8004) and collect feedback against it, then get hired through [ERC-8183](https://eips.ethereum.org/EIPS/eip-8183) job escrow. Agent Services, an MCP server or an HTTP API, can charge per request with [x402](https://x402.org) or [MPP](https://mpp.dev). Space Object reads both registries from subgraphs and shows them on a website, and serves the same data and the same prepared calls to AI agents over MCP.
 
-```bash
-vp run ready
-```
+## Requirements
 
-- Run the tests:
+- Node 22.18 or newer.
+- `vp`, the [Vite+](https://viteplus.dev/guide/) CLI, installed globally. Run
+  `curl -fsSL https://vite.plus | bash` on macOS or Linux,
+  `irm https://vite.plus/ps1 | iex` on Windows.
+- pnpm 11.25.0. You don't install it yourself; `vp` downloads the pinned version on first
+  install.
 
-```bash
-vp run -r test
-```
-
-- Build the monorepo:
-
-```bash
-vp run -r build
-```
-
-- Run the development server:
+## Setup
 
 ```bash
-vp run dev
+vp install
 ```
+
+That installs dependencies and runs `vp config`, which puts the Git hook dispatcher in place so `.vite-hooks/pre-commit` runs `vp staged` on every commit. Staged files get `vp check --fix`, so formatting and lint fixes land in the commit you are making.
+
+Run `vp install` again after every pull.
+
+## Commands
+
+```bash
+vp run dev        # website dev server
+vp check          # format, lint and type check; add --fix to apply
+vp run -r test    # tests in every workspace
+vp run -r build   # build every workspace
+vp run ready      # check, then test, then build
+```
+
+`vp <name>` is a built-in command and `vp run <name>` is a script from `package.json` or a task from `vite.config.ts`. They are different things. `vp dev` starts Vite in the current directory, `vp run dev` starts the website. Prefer `vp run` for anything in the list above.
+
+Run `vp run ready` before you open a pull request.
