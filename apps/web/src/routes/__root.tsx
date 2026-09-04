@@ -1,6 +1,6 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from "@tanstack/react-router";
+import "@spaceobject/ui/globals.css";
 import type { ReactNode } from "react";
-import "./styles.css";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -28,9 +28,15 @@ function RootComponent() {
 
 function RootDocument(props: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html className="dark" lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('theme')==='light')document.documentElement.classList.remove('dark')}catch{}",
+          }}
+        />
       </head>
       <body>
         {props.children}
