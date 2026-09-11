@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vp dev",
     "build": "vp build",
-    "deploy": "vpr build && wrangler deploy",
+    "typegen": "wrangler types --env-interface CloudflareBindings",
+    "deploy": "vpr typegen && vpr build && wrangler deploy",
     "preview": "vp preview"
   },
   "dependencies": {
