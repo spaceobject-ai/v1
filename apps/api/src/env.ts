@@ -1,6 +1,6 @@
 export interface GlobalVariables {}
 
-export interface Env<TVariables extends object = GlobalVariables> {
+export interface Env<TVariables extends object = {}> {
   Bindings: CloudflareBindings;
-  Variables: TVariables;
+  Variables: GlobalVariables & TVariables;
 }

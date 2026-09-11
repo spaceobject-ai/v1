@@ -14,7 +14,9 @@
     "preview": "vp preview"
   },
   "dependencies": {
+    "@hono/zod-openapi": "catalog:",
     "hono": "catalog:",
+    "hono-problem-details": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

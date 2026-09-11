@@ -7,8 +7,10 @@ catalogMode: prefer
 
 catalog:
   "@cloudflare/vite-plugin": ^1.54.4
+  "@hono/zod-openapi": ^1.6.3
   "@types/node": ^24
   hono: ^4.13.7
+  hono-problem-details: ^0.11.0
   typescript: ^7.0.2
   vite: npm:@voidzero-dev/vite-plus-core@0.3.0
   vite-plus: 0.3.0
