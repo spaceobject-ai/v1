@@ -20,7 +20,7 @@ const app = new Hono<Env>()
   .basePath("/v1")
   .use(async (c, next) => {
     const theGraphAuthHeaders = {
-      Authentication: `Bearer ${c.env.THE_GRAPH_SUBGRAPH_API_KEY}`,
+      Authorization: `Bearer ${c.env.THE_GRAPH_SUBGRAPH_API_KEY}`,
     };
 
     const erc8004Client = new GraphQLClient(c.env.ERC_8004_SUBGRAPH_URL, {
