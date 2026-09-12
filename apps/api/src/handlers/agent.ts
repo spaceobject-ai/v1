@@ -235,7 +235,7 @@ export const agentHandlers = new OpenAPIHono<Env>()
     const agentId = c.req.param("agentId");
 
     const { agents } = await c.var.erc8004.GetAgent({ id: entityId(agentId) });
-    const agent = agents[0];
+    const [agent] = agents;
 
     if (!agent) throw notFound(agentId);
 
@@ -248,7 +248,7 @@ export const agentHandlers = new OpenAPIHono<Env>()
     const agentId = c.req.param("agentId");
 
     const { agents } = await c.var.erc8004.GetAgentServices({ id: entityId(agentId) });
-    const agent = agents[0];
+    const [agent] = agents;
 
     if (!agent) throw notFound(agentId);
 
@@ -281,7 +281,7 @@ export const agentHandlers = new OpenAPIHono<Env>()
       first: query.limit,
       skip: query.skip,
     });
-    const agent = agents[0];
+    const [agent] = agents;
 
     if (!agent) throw notFound(agentId);
 
