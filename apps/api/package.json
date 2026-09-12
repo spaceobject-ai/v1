@@ -9,18 +9,29 @@
   "scripts": {
     "dev": "vp dev",
     "build": "vp build",
+    "codegen:erc8004": "graphql-codegen --config codegen/erc-8004.ts",
+    "codegen": "vpr codegen:erc8004",
     "typegen": "wrangler types --env-interface CloudflareBindings",
     "deploy": "vpr typegen && vpr build && wrangler deploy",
-    "preview": "vp preview"
+    "preview": "vp preview",
+    "prepare": "vpr codegen && vpr typegen"
   },
   "dependencies": {
     "@hono/zod-openapi": "catalog:",
+    "graphql": "catalog:",
+    "graphql-request": "catalog:",
+    "graphql-tag": "catalog:",
     "hono": "catalog:",
     "hono-problem-details": "catalog:",
+    "viem": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "catalog:",
+    "@graphql-codegen/cli": "catalog:",
+    "@graphql-codegen/typescript": "catalog:",
+    "@graphql-codegen/typescript-graphql-request": "catalog:",
+    "@graphql-codegen/typescript-operations": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",

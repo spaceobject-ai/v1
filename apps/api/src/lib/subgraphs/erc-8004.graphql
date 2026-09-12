@@ -1,0 +1,41 @@
+query GetAgent($id: ID!) {
+  agent(id: $id) {
+    id: agentId
+    owner {
+      address: id
+    }
+    profile: registration {
+      name
+      description
+      image
+    }
+    metadata {
+      key
+      value
+    }
+    feedbackCount: activeFeedbackCount
+    createdAt
+    createdAtTransaction
+  }
+}
+
+query GetAgent($id: ID!) {
+  agent(id: $id) {
+    id: agentId
+    owner {
+      address: id
+    }
+    profile: registration {
+      name
+      description
+      image
+    }
+    metadata {
+      key
+      value
+    }
+    feedbackCount: activeFeedbackCount
+    createdAt
+    createdAtTransaction
+  }
+}
