@@ -1,7 +1,8 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: "https://api.studio.thegraph.com/query/1723243/erc-8004-arc-testnet/version/latest",
+  schema:
+    "https://gateway.thegraph.com/api/deployments/id/QmZaHTCRTtC9XkobXZCvnHEAxZbtU3rTiFg5oS1ebosHzN",
   documents: ["src/lib/subgraphs/erc-8004.graphql"],
   ignoreNoDocuments: true,
   generates: {

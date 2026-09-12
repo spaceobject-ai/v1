@@ -2,7 +2,7 @@ import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
   schema:
-    "https://api.studio.thegraph.com/query/1723243/space-object-erc-8183-agentic-commerce/version/latest",
+    "https://gateway.thegraph.com/api/deployments/id/QmNzCzcMXZL7BDPTGFCpzJPomsq1gMTw3D8GU1heduCKxU",
   documents: ["src/lib/subgraphs/erc-8183.graphql"],
   ignoreNoDocuments: true,
   generates: {

@@ -9,7 +9,7 @@
     "head_sampling_rate": 0.1,
   },
   "vars": {
-    "ERC_8004_SUBGRAPH_URL": "https://api.studio.thegraph.com/query/1723243/erc-8004-arc-testnet/version/latest",
-    "ERC_8183_SUBGRAPH_URL": "https://api.studio.thegraph.com/query/1723243/space-object-erc-8183-agentic-commerce/version/latest",
+    "ERC_8004_SUBGRAPH_URL": "https://gateway.thegraph.com/api/deployments/id/QmZaHTCRTtC9XkobXZCvnHEAxZbtU3rTiFg5oS1ebosHzN",
+    "ERC_8183_SUBGRAPH_URL": "https://gateway.thegraph.com/api/deployments/id/QmNzCzcMXZL7BDPTGFCpzJPomsq1gMTw3D8GU1heduCKxU",
   },
 }
