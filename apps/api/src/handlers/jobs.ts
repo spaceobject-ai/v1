@@ -1,5 +1,6 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { addressSchema, agentIdSchema } from "@spaceobject/utils";
+import { zeroAddress, isAddressEqual } from "viem";
 
 import { Job_Filter, JobStatus, JobSummaryFragment } from "../../.generated/erc-8183";
 import { Env } from "../env";
@@ -87,8 +88,12 @@ const toJobSummary = (job: JobSummaryFragment, nowSeconds: number) => ({
 
 export const listJobsQuerySchema = z.object({
   client: addressSchema.optional().openapi({ description: "Job client address" }),
-  provider: addressSchema.optional().openapi({ description: "Job provider address" }),
-  agentId: agentIdSchema.optional().openapi({ description: "Job provider agent ID" }),
+  provider: addressSchema.optional().openapi({
+    description: "Job provider address. Pass the zero address to find jobs with no provider",
+  }),
+  agentId: agentIdSchema.optional().openapi({
+    description: "Job provider agent ID. Pass 0 to find jobs not assigned to any agent",
+  }),
   status: z
     .enum(["OPEN", "FUNDED", "SUBMITTED", "COMPLETED", "REJECTED", "EXPIRED"])
     .optional()
@@ -136,8 +141,15 @@ export const jobHandlers = new OpenAPIHono<Env>().openapi(listJobsRoute, async (
 
   const baseFilter = {
     ...(query.client ? { client: query.client.toLowerCase() } : {}),
-    ...(query.provider ? { provider: query.provider.toLowerCase() } : {}),
-    ...(query.agentId ? { providerAgentId: query.agentId.toString() } : {}),
+    // The zero address means "no provider", which the subgraph stores as null.
+    ...(query.provider
+      ? {
+          provider: isAddressEqual(query.provider, zeroAddress)
+            ? null
+            : query.provider.toLowerCase(),
+        }
+      : {}),
+    ...(query.agentId !== undefined ? { providerAgentId: query.agentId.toString() } : {}),
   };
 
   const { jobs } = await c.var.erc8183.ListJobs({
