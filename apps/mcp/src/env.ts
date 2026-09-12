@@ -1,6 +1,10 @@
-export interface GlobalVariables {}
+import { ApiClient } from "./lib/api";
 
-export interface Env<TVariables extends object = GlobalVariables> {
+export interface GlobalVariables {
+  apiClient: ApiClient;
+}
+
+export interface Env<TVariables extends object = {}> {
   Bindings: CloudflareBindings;
-  Variables: TVariables;
+  Variables: GlobalVariables & TVariables;
 }

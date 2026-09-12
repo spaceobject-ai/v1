@@ -1,19 +1,19 @@
 {
   "name": "@spaceobject/mcp",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vp dev",
     "build": "vp build",
     "typegen": "wrangler types --env-interface CloudflareBindings",
-    "deploy": "vpr typegen && vpr build && wrangler deploy",
+    "deploy": "vpr build && wrangler deploy",
     "preview": "vp preview"
   },
   "dependencies": {
     "@hono/mcp": "catalog:",
     "@modelcontextprotocol/sdk": "catalog:",
-    "@spaceobject/core": "workspace:*",
+    "@spaceobject/api": "workspace:*",
     "hono": "catalog:",
     "zod": "catalog:"
   },

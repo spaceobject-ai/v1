@@ -8,4 +8,7 @@
     "enabled": true,
     "head_sampling_rate": 0.1,
   },
+  "vars": {
+    "BASE_API_URL": "https://spaceobject-api.luckzivanius.workers.dev",
+  },
 }
