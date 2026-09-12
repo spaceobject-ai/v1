@@ -1,8 +1,14 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
+import { requireEnv } from "./env.js";
 
 const config: CodegenConfig = {
-  schema:
-    "https://gateway.thegraph.com/api/deployments/id/QmNzCzcMXZL7BDPTGFCpzJPomsq1gMTw3D8GU1heduCKxU",
+  schema: {
+    [requireEnv("ERC_8183_SUBGRAPH_URL")]: {
+      headers: {
+        Authorization: `Bearer ${requireEnv("THE_GRAPH_SUBGRAPH_API_KEY")}`,
+      },
+    },
+  },
   documents: ["src/lib/subgraphs/erc-8183.graphql"],
   ignoreNoDocuments: true,
   generates: {
