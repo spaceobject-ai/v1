@@ -26,9 +26,6 @@ app
   .all("/", async (c) => {
     const server = new McpServer({ name: "spaceobject", version: "0.1.0" });
 
-    const transport = new StreamableHTTPTransport();
-    await server.connect(transport);
-
     const apiClient = c.get("apiClient");
 
     const tools = [
@@ -42,6 +39,11 @@ app
     ];
 
     tools.forEach((register) => register(server));
+
+    // Tools must register before connecting; the SDK rejects capability
+    // registration after the transport is attached.
+    const transport = new StreamableHTTPTransport();
+    await server.connect(transport);
 
     return transport.handleRequest(c);
   });
