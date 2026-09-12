@@ -3,7 +3,7 @@ import { OpenAPIHono as Hono } from "@hono/zod-openapi";
 import { problemDetailsHandler } from "hono-problem-details";
 import { logger } from "hono/logger";
 
-import { getSdk } from "../.generated/erc-8004/sdk";
+import { getSdk } from "../.generated/erc-8004";
 import { agentHandlers } from "./handlers/agent";
 import { Env } from "./env";
 

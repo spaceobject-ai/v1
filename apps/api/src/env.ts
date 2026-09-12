@@ -1,4 +1,4 @@
-import { Sdk } from "../.generated/erc-8004/sdk";
+import { Sdk } from "../.generated/erc-8004";
 
 export interface GlobalVariables {
   erc8004: Sdk;

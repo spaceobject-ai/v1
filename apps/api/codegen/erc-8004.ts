@@ -5,9 +5,15 @@ const config: CodegenConfig = {
   documents: ["src/lib/subgraphs/erc-8004.graphql"],
   ignoreNoDocuments: true,
   generates: {
-    ".generated/erc-8004/sdk.ts": {
+    ".generated/erc-8004/index.ts": {
       plugins: ["typescript", "typescript-operations", "typescript-graphql-request"],
-      config: {},
+      config: {
+        scalars: {
+          BigInt: "string",
+          Bytes: "string",
+          Timestamp: "string",
+        },
+      },
     },
   },
 };
