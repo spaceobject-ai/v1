@@ -87,6 +87,7 @@ const toJobSummary = (job: JobSummaryFragment, nowSeconds: number) => ({
 export const listJobsQuerySchema = z.object({
   client: z.string().optional().openapi({ description: "Job client address" }),
   provider: z.string().optional().openapi({ description: "Job provider address" }),
+  agentId: z.string().optional().openapi({ description: "Job provider agent ID" }),
   status: z
     .enum(["OPEN", "FUNDED", "SUBMITTED", "COMPLETED", "REJECTED", "EXPIRED"])
     .optional()
@@ -135,6 +136,7 @@ export const jobHandlers = new OpenAPIHono<Env>().openapi(listJobsRoute, async (
   const baseFilter = {
     ...(query.client ? { client: query.client.toLowerCase() } : {}),
     ...(query.provider ? { provider: query.provider.toLowerCase() } : {}),
+    ...(query.agentId ? { providerAgentId: query.agentId } : {}),
   };
 
   const { jobs } = await c.var.erc8183.ListJobs({

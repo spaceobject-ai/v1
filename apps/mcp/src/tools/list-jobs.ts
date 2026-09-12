@@ -10,10 +10,11 @@ export const registerListJobsTool = (client: ApiClient) => (server: McpServer) =
     {
       title: "List jobs",
       description:
-        "List jobs, optionally filtered by client address, provider address, or status. Each job includes its status, participants, budget, description, timestamps, and activity history. Paginate with limit and skip.",
+        "List jobs, optionally filtered by client address, provider address, provider agent ID, or status. Each job includes its status, participants, budget, description, timestamps, and activity history. Paginate with limit and skip.",
       inputSchema: {
         client: z.string().optional().describe("Filter by job client address"),
         provider: z.string().optional().describe("Filter by job provider address"),
+        agentId: z.string().optional().describe("Filter by job provider agent ID"),
         status: z
           .enum(["OPEN", "FUNDED", "SUBMITTED", "COMPLETED", "REJECTED", "EXPIRED"])
           .optional()
@@ -29,6 +30,7 @@ export const registerListJobsTool = (client: ApiClient) => (server: McpServer) =
         query: {
           client: input.client,
           provider: input.provider,
+          agentId: input.agentId,
           status: input.status,
           limit: String(input.limit),
           skip: String(input.skip),
