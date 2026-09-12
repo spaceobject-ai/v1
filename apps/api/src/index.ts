@@ -7,6 +7,7 @@ import { getSdk as getErc8004Sdk } from "../.generated/erc-8004";
 import { getSdk as getErc8183Sdk } from "../.generated/erc-8183";
 
 import { agentHandlers } from "./handlers/agent";
+import { jobHandlers } from "./handlers/jobs";
 import { Env } from "./env";
 
 const app = new Hono<Env>()
@@ -33,6 +34,7 @@ const app = new Hono<Env>()
 
     return next();
   })
-  .route("/agents", agentHandlers);
+  .route("/agents", agentHandlers)
+  .route("/jobs", jobHandlers);
 
 export default app;
