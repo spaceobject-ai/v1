@@ -2,9 +2,6 @@ import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 
 import { JobSummaryFragment } from "../../.generated/erc-8183";
 import { Env } from "../env";
-import { jobEntityId } from "../utils/job";
-import { CHAIN_IDS } from "../config/chain";
-import { ESCROWS } from "../config/escrow";
 
 const jobActivitySchema = z.object({
   kind: z.string(),
@@ -86,9 +83,6 @@ export const listJobsRoute = createRoute({
   },
 });
 
-const entityId = (jobId: string) =>
-  jobEntityId(CHAIN_IDS.arcTestnet, ESCROWS[CHAIN_IDS.arcTestnet], jobId);
-
 export const jobHandlers = new OpenAPIHono<Env>().openapi(listJobsRoute, async (c) => {
   const query = c.req.valid("query");
 
@@ -97,7 +91,7 @@ export const jobHandlers = new OpenAPIHono<Env>().openapi(listJobsRoute, async (
     where: {
       ...(query.client ? { client: query.client.toLowerCase() } : {}),
       ...(query.provider ? { provider: query.provider.toLowerCase() } : {}),
-      ...(query.lastId ? { id_gt: entityId(query.lastId) } : {}),
+      ...(query.lastId ? { jobId_gt: query.lastId } : {}),
     },
   });
 

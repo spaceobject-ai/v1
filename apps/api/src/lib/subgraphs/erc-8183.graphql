@@ -27,13 +27,13 @@ fragment JobSummary on Job {
   expiresAt
   createdAt
   updatedAt
-  activities: events(orderBy: timestamp, orderDirection: asc) {
+  activities: events(first: 1000, orderBy: timestamp, orderDirection: asc) {
     ...JobActivity
   }
 }
 
 query ListJobs($first: Int, $where: Job_filter) {
-  jobs(first: $first, orderBy: id, orderDirection: asc, where: $where) {
+  jobs(first: $first, orderBy: jobId, orderDirection: asc, where: $where) {
     ...JobSummary
   }
 }
