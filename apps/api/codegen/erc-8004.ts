@@ -6,7 +6,7 @@ const config: CodegenConfig = {
   ignoreNoDocuments: true,
   generates: {
     ".generated/erc-8004/index.ts": {
-      plugins: ["typescript", "typescript-operations", "typescript-graphql-request"],
+      plugins: ["typescript-operations", "typescript-graphql-request"],
       config: {
         scalars: {
           BigInt: "string",
