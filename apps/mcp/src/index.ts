@@ -4,8 +4,14 @@ import { ApiClientType } from "@spaceobject/api/rpc";
 import { Hono } from "hono";
 import { hc } from "hono/client";
 import { logger } from "hono/logger";
-import { Env } from "./env";
+
+import { registerGetAgentTool } from "./tools/get-agent";
+import { registerListAgentFeedbacksTool } from "./tools/list-agent-feedbacks";
+import { registerListAgentServicesTool } from "./tools/list-agent-services";
+import { registerListJobsTool } from "./tools/list-jobs";
 import { registerSearchAgentsTool } from "./tools/search-agents";
+
+import { Env } from "./env";
 
 const app = new Hono<Env>();
 
@@ -25,7 +31,17 @@ app
 
     const apiClient = c.get("apiClient");
 
-    registerSearchAgentsTool(apiClient)(server);
+    const tools = [
+      // Agents
+      registerSearchAgentsTool(apiClient),
+      registerGetAgentTool(apiClient),
+      registerListAgentServicesTool(apiClient),
+      registerListAgentFeedbacksTool(apiClient),
+      // Jobs
+      registerListJobsTool(apiClient),
+    ];
+
+    tools.forEach((register) => register(server));
 
     return transport.handleRequest(c);
   });

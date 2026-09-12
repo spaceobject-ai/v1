@@ -4,25 +4,23 @@ import { z } from "zod";
 import { ApiClient } from "../lib/api";
 import { jsonToolResult } from "../lib/mcp";
 
-export const registerSearchAgentsTool = (client: ApiClient) => (server: McpServer) => {
+export const registerListAgentFeedbacksTool = (client: ApiClient) => (server: McpServer) => {
   server.registerTool(
-    "search_agents",
+    "list_agent_feedbacks",
     {
-      title: "Search agents",
+      title: "List agent feedbacks",
       description:
-        "Search registered agents by text, or list them without a query. Each result includes the agent id, name, description, metadata, feedback count, and owner address. Paginate with limit and skip.",
+        "List feedback left for an agent. Each entry has the client address, score, tags, feedback URI, and creation details. Paginate with limit and skip. Errors if the agent does not exist.",
       inputSchema: {
-        q: z.string().optional().describe("Text to match against agent profiles"),
-        owner: z.string().optional().describe("Filter by owner address"),
+        agentId: z.string().describe("Agent id"),
         limit: z.number().int().positive().max(1000).default(50).describe("Maximum results"),
         skip: z.number().int().nonnegative().max(5000).default(0).describe("Results to skip"),
       },
     },
     async (input) => {
-      const response = await client.v1.agents.$get({
+      const response = await client.v1.agents[":agentId"].feedbacks.$get({
+        param: { agentId: input.agentId },
         query: {
-          q: input.q,
-          owner: input.owner,
           limit: String(input.limit),
           skip: String(input.skip),
         },

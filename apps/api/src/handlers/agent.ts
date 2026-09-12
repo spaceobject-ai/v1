@@ -33,24 +33,24 @@ const toAgentSummary = (agent: AgentSummaryFragment) => ({
   createdAtTransaction: agent.createdAtTransaction,
 });
 
-export const searchAgentsQuerySchema = z
-  .object({
-    q: z.string().optional().openapi({ description: "Search query" }),
-    owner: z.string().optional().openapi({ description: "Agent owner address" }),
-    limit: z.coerce
-      .number()
-      .int()
-      .positive()
-      .max(1000)
-      .default(50)
-      .openapi({ description: "Maximum results per query", example: 50 }),
-    lastAgentId: z.string().optional().openapi({
-      description: "Cursor from the previous page; only supported without q",
-    }),
-  })
-  .refine((query) => !(query.q && query.lastAgentId), {
-    message: "lastAgentId is only supported without q",
-  });
+export const searchAgentsQuerySchema = z.object({
+  q: z.string().optional().openapi({ description: "Search query" }),
+  owner: z.string().optional().openapi({ description: "Agent owner address" }),
+  limit: z.coerce
+    .number()
+    .int()
+    .positive()
+    .max(1000)
+    .default(50)
+    .openapi({ description: "Maximum results per query", example: 50 }),
+  skip: z.coerce
+    .number()
+    .int()
+    .nonnegative()
+    .max(5000)
+    .default(0)
+    .openapi({ description: "Number of results to skip" }),
+});
 export const searchAgentsOutputSchema = z.array(agentSummarySchema);
 export const searchAgentsRoute = createRoute({
   method: "get",
@@ -213,16 +213,17 @@ export const agentHandlers = new OpenAPIHono<Env>()
           await c.var.erc8004.SearchAgentProfiles({
             text: query.q,
             first: query.limit,
+            skip: query.skip,
             where: owner ? { agent_: { owner } } : undefined,
           })
         ).agentProfileSearch.map((profile) => profile.agent)
       : (
           await c.var.erc8004.ListAgents({
             first: query.limit,
+            skip: query.skip,
             where: {
               registration_not: null,
               ...(owner ? { owner } : {}),
-              ...(query.lastAgentId ? { agentId_gt: query.lastAgentId } : {}),
             },
           })
         ).agents;

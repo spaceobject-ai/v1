@@ -63,7 +63,13 @@ export const listJobsQuerySchema = z.object({
     .max(1000)
     .default(20)
     .openapi({ description: "Maximum results per query", example: 20 }),
-  lastId: z.string().optional().openapi({ description: "Job id cursor from the previous page" }),
+  skip: z.coerce
+    .number()
+    .int()
+    .nonnegative()
+    .max(5000)
+    .default(0)
+    .openapi({ description: "Number of results to skip" }),
 });
 export const listJobsOutputSchema = z.array(jobSummarySchema);
 export const listJobsRoute = createRoute({
@@ -89,10 +95,10 @@ export const jobHandlers = new OpenAPIHono<Env>().openapi(listJobsRoute, async (
 
   const { jobs } = await c.var.erc8183.ListJobs({
     first: query.limit,
+    skip: query.skip,
     where: {
       ...(query.client ? { client: query.client.toLowerCase() } : {}),
       ...(query.provider ? { provider: query.provider.toLowerCase() } : {}),
-      ...(query.lastId ? { jobId_gt: query.lastId } : {}),
     },
   });
 
