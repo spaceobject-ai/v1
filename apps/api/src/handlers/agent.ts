@@ -32,17 +32,24 @@ const toAgentSummary = (agent: AgentSummaryFragment) => ({
   createdAtTransaction: agent.createdAtTransaction,
 });
 
-export const searchAgentsQuerySchema = z.object({
-  q: z.string().optional().openapi({ description: "Search query" }),
-  owner: z.string().optional().openapi({ description: "Agent owner address" }),
-  limit: z.coerce
-    .number()
-    .int()
-    .positive()
-    .default(50)
-    .openapi({ description: "Maximum results per query", example: 50 }),
-  lastAgentId: z.string().optional().openapi({ description: "Cursor from the previous page" }),
-});
+export const searchAgentsQuerySchema = z
+  .object({
+    q: z.string().optional().openapi({ description: "Search query" }),
+    owner: z.string().optional().openapi({ description: "Agent owner address" }),
+    limit: z.coerce
+      .number()
+      .int()
+      .positive()
+      .max(1000)
+      .default(50)
+      .openapi({ description: "Maximum results per query", example: 50 }),
+    lastAgentId: z.string().optional().openapi({
+      description: "Cursor from the previous page; only supported without q",
+    }),
+  })
+  .refine((query) => !(query.q && query.lastAgentId), {
+    message: "lastAgentId is only supported without q",
+  });
 export const searchAgentsOutputSchema = z.array(agentSummarySchema);
 export const searchAgentsRoute = createRoute({
   method: "get",
@@ -126,12 +133,14 @@ export const listAgentFeedbacksQuerySchema = z.object({
     .number()
     .int()
     .positive()
+    .max(1000)
     .default(50)
     .openapi({ description: "Maximum results per query", example: 50 }),
   skip: z.coerce
     .number()
     .int()
     .nonnegative()
+    .max(5000)
     .default(0)
     .openapi({ description: "Number of results to skip" }),
 });
@@ -225,11 +234,8 @@ export const agentHandlers = new OpenAPIHono<Env>()
   .openapi(getAgentRoute, async (c) => {
     const agentId = c.req.param("agentId");
 
-    // Resolving a null registration errors on the deployed subgraph, so treat
-    // a failed query as not found.
-    const { agent } = await c.var.erc8004
-      .GetAgent({ id: entityId(agentId) })
-      .catch(() => ({ agent: null }));
+    const { agents } = await c.var.erc8004.GetAgent({ id: entityId(agentId) });
+    const agent = agents[0];
 
     if (!agent) throw notFound(agentId);
 
@@ -241,11 +247,8 @@ export const agentHandlers = new OpenAPIHono<Env>()
   .openapi(listAgentServicesRoute, async (c) => {
     const agentId = c.req.param("agentId");
 
-    // Resolving a null registration errors on the deployed subgraph, so treat
-    // a failed query as not found.
-    const { agent } = await c.var.erc8004
-      .GetAgentServices({ id: entityId(agentId) })
-      .catch(() => ({ agent: null }));
+    const { agents } = await c.var.erc8004.GetAgentServices({ id: entityId(agentId) });
+    const agent = agents[0];
 
     if (!agent) throw notFound(agentId);
 
@@ -273,11 +276,12 @@ export const agentHandlers = new OpenAPIHono<Env>()
     const agentId = c.req.param("agentId");
     const query = c.req.valid("query");
 
-    const { agent } = await c.var.erc8004.GetAgentFeedbacks({
+    const { agents } = await c.var.erc8004.GetAgentFeedbacks({
       id: entityId(agentId),
       first: query.limit,
       skip: query.skip,
     });
+    const agent = agents[0];
 
     if (!agent) throw notFound(agentId);
 

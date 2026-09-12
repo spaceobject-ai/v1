@@ -1,7 +1,7 @@
 # Agent.registration resolves through the AgentRegistrationData interface, and
-# the deployed subgraph errors at the store level when the field is null. List
-# queries filter on registration_not: null and single-agent handlers treat a
-# query error as not found.
+# the deployed subgraph errors at the store level when the field is null. All
+# queries filter on registration_not: null, and single-agent queries use the
+# list field with an id filter so agents without a registration return [].
 fragment AgentSummary on Agent {
   id: agentId
   owner {
@@ -21,8 +21,8 @@ fragment AgentSummary on Agent {
   createdAtTransaction
 }
 
-query GetAgent($id: ID!) {
-  agent(id: $id) {
+query GetAgent($id: Bytes!) {
+  agents(first: 1, where: { id: $id, registration_not: null }) {
     ...AgentSummary
   }
 }
@@ -41,8 +41,8 @@ query SearchAgentProfiles($text: String!, $first: Int, $where: AgentRegistration
   }
 }
 
-query GetAgentServices($id: ID!) {
-  agent(id: $id) {
+query GetAgentServices($id: Bytes!) {
+  agents(first: 1, where: { id: $id, registration_not: null }) {
     registration {
       ... on AgentRegistration {
         services(orderBy: position, orderDirection: asc) {
@@ -66,8 +66,8 @@ query GetAgentServices($id: ID!) {
   }
 }
 
-query GetAgentFeedbacks($id: ID!, $first: Int, $skip: Int) {
-  agent(id: $id) {
+query GetAgentFeedbacks($id: Bytes!, $first: Int, $skip: Int) {
+  agents(first: 1, where: { id: $id, registration_not: null }) {
     feedback(
       first: $first
       skip: $skip
