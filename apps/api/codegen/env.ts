@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import { parse } from "jsonc-parser";
 
 // Load .dev.vars for local runs. CI provides these variables through the
 // environment instead; loadEnvFile never overrides already-set variables.
@@ -8,11 +9,9 @@ if (existsSync(devVars)) process.loadEnvFile(devVars);
 
 // The subgraph URLs are not secrets; fall back to the values committed in
 // wrangler.jsonc so only THE_GRAPH_SUBGRAPH_API_KEY must come from the
-// environment. Strips line comments and trailing commas before parsing.
-const wranglerVars: Record<string, string> = JSON.parse(
-  readFileSync(fileURLToPath(new URL("../wrangler.jsonc", import.meta.url)), "utf8")
-    .replace(/^\s*\/\/.*$/gm, "")
-    .replace(/,(\s*[}\]])/g, "$1"),
+// environment.
+const wranglerVars: Record<string, string> = parse(
+  readFileSync(fileURLToPath(new URL("../wrangler.jsonc", import.meta.url)), "utf8"),
 ).vars;
 
 export function requireEnv(name: string) {

@@ -5,6 +5,7 @@ import { problemDetails } from "hono-problem-details";
 import { AgentSummaryFragment } from "../../.generated/erc-8004";
 import { Env } from "../env";
 import { agentEntityId } from "../utils/agent";
+import { parseTimestamp } from "../utils/timestamp";
 import { CHAIN_IDS } from "../config/chain";
 import { REGISTRIES } from "../config/agent-registry";
 
@@ -28,7 +29,7 @@ const toAgentSummary = (agent: AgentSummaryFragment) => ({
   metadata: Object.fromEntries(agent.metadata.map(({ key, value }) => [key, value])),
   feedbackCount: Number(agent.feedbackCount),
   owner: agent.owner?.address ?? "0x",
-  createdAt: Number(agent.createdAt),
+  createdAt: parseTimestamp(agent.createdAt),
   createdAtTransaction: agent.createdAtTransaction,
 });
 
@@ -293,7 +294,7 @@ export const agentHandlers = new OpenAPIHono<Env>()
         tag1: feedback.tag1,
         tag2: feedback.tag2,
         uri: feedback.feedbackURI,
-        createdAt: Number(feedback.createdAt),
+        createdAt: parseTimestamp(feedback.createdAt),
         createdAtTransaction: feedback.createdAtTransaction,
       })),
     );

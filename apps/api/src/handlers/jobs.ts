@@ -2,6 +2,7 @@ import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 
 import { JobSummaryFragment } from "../../.generated/erc-8183";
 import { Env } from "../env";
+import { parseTimestamp } from "../utils/timestamp";
 
 const jobActivitySchema = z.object({
   kind: z.string(),
@@ -40,14 +41,14 @@ const toJobSummary = (job: JobSummaryFragment) => ({
   agentId: job.providerAgentId === "0" ? null : job.providerAgentId,
   description: job.description,
   budget: job.paymentToken ? { amount: job.budget, token: job.paymentToken } : null,
-  expiresAt: Number(job.expiresAt),
-  createdAt: Number(job.createdAt),
-  updatedAt: Number(job.updatedAt),
+  expiresAt: parseTimestamp(job.expiresAt),
+  createdAt: parseTimestamp(job.createdAt),
+  updatedAt: parseTimestamp(job.updatedAt),
   activities: job.activities.map((activity) => ({
     kind: activity.kind,
     address: activity.actor?.address ?? null,
     amount: activity.amount ?? null,
-    timestamp: Number(activity.timestamp),
+    timestamp: parseTimestamp(activity.timestamp),
     txHash: activity.txHash,
   })),
 });
