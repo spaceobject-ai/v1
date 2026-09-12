@@ -1,5 +1,4 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { addressSchema, agentIdSchema } from "@spaceobject/utils";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { problemDetailsResponse } from "hono-problem-details/openapi";
 import { problemDetails } from "hono-problem-details";
 
@@ -9,18 +8,17 @@ import { agentEntityId } from "../utils/agent";
 import { parseTimestamp } from "../utils/timestamp";
 import { CHAIN_IDS } from "../config/chain";
 import { REGISTRIES } from "../config/agent-registry";
-
-const agentSummarySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  image: z.string().nullable(),
-  metadata: z.record(z.string(), z.unknown()),
-  feedbackCount: z.number(),
-  owner: z.string(),
-  createdAt: z.number(),
-  createdAtTransaction: z.string(),
-});
+import {
+  getAgentOutputSchema,
+  getAgentParamsSchema,
+  listAgentFeedbacksOutputSchema,
+  listAgentFeedbacksParamsSchema,
+  listAgentFeedbacksQuerySchema,
+  listAgentServicesOutputSchema,
+  listAgentServicesParamsSchema,
+  searchAgentsOutputSchema,
+  searchAgentsQuerySchema,
+} from "../schemas/agents";
 
 const toAgentSummary = (agent: AgentSummaryFragment) => ({
   id: agent.id,
@@ -34,25 +32,6 @@ const toAgentSummary = (agent: AgentSummaryFragment) => ({
   createdAtTransaction: agent.createdAtTransaction,
 });
 
-export const searchAgentsQuerySchema = z.object({
-  q: z.string().optional().openapi({ description: "Search query" }),
-  owner: addressSchema.optional().openapi({ description: "Agent owner address" }),
-  limit: z.coerce
-    .number()
-    .int()
-    .positive()
-    .max(1000)
-    .default(50)
-    .openapi({ description: "Maximum results per query", example: 50 }),
-  skip: z.coerce
-    .number()
-    .int()
-    .nonnegative()
-    .max(5000)
-    .default(0)
-    .openapi({ description: "Number of results to skip" }),
-});
-export const searchAgentsOutputSchema = z.array(agentSummarySchema);
 export const searchAgentsRoute = createRoute({
   method: "get",
   path: "/",
@@ -71,10 +50,6 @@ export const searchAgentsRoute = createRoute({
   },
 });
 
-export const getAgentParamsSchema = z.object({
-  agentId: agentIdSchema,
-});
-export const getAgentOutputSchema = agentSummarySchema;
 export const getAgentRoute = createRoute({
   method: "get",
   path: "/{agentId}",
@@ -94,20 +69,6 @@ export const getAgentRoute = createRoute({
   },
 });
 
-export const listAgentServicesParamsSchema = z.object({
-  agentId: agentIdSchema,
-});
-export const listAgentServicesOutputSchema = z.array(
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    kind: z.string(),
-    endpoint: z.string(),
-    version: z.string().nullable(),
-    features: z.array(z.object({ kind: z.string(), value: z.string() })),
-    attributes: z.record(z.string(), z.unknown()),
-  }),
-);
 export const listAgentServicesRoute = createRoute({
   method: "get",
   path: "/{agentId}/services",
@@ -127,37 +88,6 @@ export const listAgentServicesRoute = createRoute({
   },
 });
 
-export const listAgentFeedbacksParamsSchema = z.object({
-  agentId: agentIdSchema,
-});
-export const listAgentFeedbacksQuerySchema = z.object({
-  limit: z.coerce
-    .number()
-    .int()
-    .positive()
-    .max(1000)
-    .default(50)
-    .openapi({ description: "Maximum results per query", example: 50 }),
-  skip: z.coerce
-    .number()
-    .int()
-    .nonnegative()
-    .max(5000)
-    .default(0)
-    .openapi({ description: "Number of results to skip" }),
-});
-export const listAgentFeedbacksOutputSchema = z.array(
-  z.object({
-    id: z.string(),
-    client: z.string(),
-    score: z.number(),
-    tag1: z.string(),
-    tag2: z.string(),
-    uri: z.string(),
-    createdAt: z.number(),
-    createdAtTransaction: z.string(),
-  }),
-);
 export const listAgentFeedbacksRoute = createRoute({
   method: "get",
   path: "/{agentId}/feedbacks",

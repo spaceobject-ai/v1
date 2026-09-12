@@ -1,4 +1,6 @@
-import app from ".";
+// Type-only import keeps the app (route registration, problem-details
+// middleware) out of consumer bundles like apps/mcp.
+import type app from ".";
 
 export {
   getAgentOutputSchema,
@@ -10,7 +12,7 @@ export {
   listAgentServicesParamsSchema,
   searchAgentsOutputSchema,
   searchAgentsQuerySchema,
-} from "./handlers/agent";
-export { listJobsOutputSchema, listJobsQuerySchema } from "./handlers/jobs";
+} from "./schemas/agents";
+export { listJobsOutputSchema, listJobsQuerySchema } from "./schemas/jobs";
 
 export type ApiClientType = typeof app;

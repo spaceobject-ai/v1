@@ -1,10 +1,10 @@
-import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
-import { addressSchema, agentIdSchema } from "@spaceobject/utils";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { zeroAddress, isAddressEqual } from "viem";
 
 import { Job_Filter, JobStatus, JobSummaryFragment } from "../../.generated/erc-8183";
 import { Env } from "../env";
 import { parseTimestamp } from "../utils/timestamp";
+import { listJobsOutputSchema, listJobsQuerySchema } from "../schemas/jobs";
 
 // The escrow only flips a job to EXPIRED when someone calls claimRefund, so a
 // job past its deadline can still read OPEN, FUNDED, or SUBMITTED on-chain.
@@ -37,34 +37,6 @@ const statusFilters = (status: JobStatus, nowSeconds: number): Job_Filter[] => {
   return [{ status }];
 };
 
-const jobActivitySchema = z.object({
-  kind: z.string(),
-  address: z.string().nullable(),
-  amount: z.string().nullable(),
-  timestamp: z.number(),
-  txHash: z.string(),
-});
-
-const jobSummarySchema = z.object({
-  id: z.string(),
-  status: z.string(),
-  client: z.string(),
-  provider: z.string().nullable(),
-  evaluator: z.string(),
-  agentId: z.string().nullable(),
-  description: z.string(),
-  budget: z
-    .object({
-      amount: z.string(),
-      token: z.string(),
-    })
-    .nullable(),
-  expiresAt: z.number(),
-  createdAt: z.number(),
-  updatedAt: z.number(),
-  activities: z.array(jobActivitySchema),
-});
-
 const toJobSummary = (job: JobSummaryFragment, nowSeconds: number) => ({
   id: job.jobId,
   status: effectiveStatus(job, nowSeconds),
@@ -86,37 +58,6 @@ const toJobSummary = (job: JobSummaryFragment, nowSeconds: number) => ({
   })),
 });
 
-export const listJobsQuerySchema = z.object({
-  client: addressSchema.optional().openapi({ description: "Job client address" }),
-  provider: addressSchema.optional().openapi({
-    description: "Job provider address. Pass the zero address to find jobs with no provider",
-  }),
-  agentId: agentIdSchema.optional().openapi({
-    description: "Job provider agent ID. Pass 0 to find jobs not assigned to any agent",
-  }),
-  status: z
-    .enum(["OPEN", "FUNDED", "SUBMITTED", "COMPLETED", "REJECTED", "EXPIRED"])
-    .optional()
-    .openapi({
-      description:
-        "Job status. EXPIRED includes jobs past their deadline even if no refund was claimed yet",
-    }),
-  limit: z.coerce
-    .number()
-    .int()
-    .positive()
-    .max(1000)
-    .default(20)
-    .openapi({ description: "Maximum results per query", example: 20 }),
-  skip: z.coerce
-    .number()
-    .int()
-    .nonnegative()
-    .max(5000)
-    .default(0)
-    .openapi({ description: "Number of results to skip" }),
-});
-export const listJobsOutputSchema = z.array(jobSummarySchema);
 export const listJobsRoute = createRoute({
   method: "get",
   path: "/",
