@@ -1,4 +1,5 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
+import { addressSchema, agentIdSchema } from "@spaceobject/utils";
 import { problemDetailsResponse } from "hono-problem-details/openapi";
 import { problemDetails } from "hono-problem-details";
 
@@ -35,7 +36,7 @@ const toAgentSummary = (agent: AgentSummaryFragment) => ({
 
 export const searchAgentsQuerySchema = z.object({
   q: z.string().optional().openapi({ description: "Search query" }),
-  owner: z.string().optional().openapi({ description: "Agent owner address" }),
+  owner: addressSchema.optional().openapi({ description: "Agent owner address" }),
   limit: z.coerce
     .number()
     .int()
@@ -71,7 +72,7 @@ export const searchAgentsRoute = createRoute({
 });
 
 export const getAgentParamsSchema = z.object({
-  agentId: z.string(),
+  agentId: agentIdSchema,
 });
 export const getAgentOutputSchema = agentSummarySchema;
 export const getAgentRoute = createRoute({
@@ -94,7 +95,7 @@ export const getAgentRoute = createRoute({
 });
 
 export const listAgentServicesParamsSchema = z.object({
-  agentId: z.string(),
+  agentId: agentIdSchema,
 });
 export const listAgentServicesOutputSchema = z.array(
   z.object({
@@ -127,7 +128,7 @@ export const listAgentServicesRoute = createRoute({
 });
 
 export const listAgentFeedbacksParamsSchema = z.object({
-  agentId: z.string(),
+  agentId: agentIdSchema,
 });
 export const listAgentFeedbacksQuerySchema = z.object({
   limit: z.coerce
@@ -234,7 +235,7 @@ export const agentHandlers = new OpenAPIHono<Env>()
     return c.json(result.data);
   })
   .openapi(getAgentRoute, async (c) => {
-    const agentId = c.req.param("agentId");
+    const agentId = c.req.valid("param").agentId.toString();
 
     const { agents } = await c.var.erc8004.GetAgent({ id: entityId(agentId) });
     const [agent] = agents;
@@ -247,7 +248,7 @@ export const agentHandlers = new OpenAPIHono<Env>()
     return c.json(result.data);
   })
   .openapi(listAgentServicesRoute, async (c) => {
-    const agentId = c.req.param("agentId");
+    const agentId = c.req.valid("param").agentId.toString();
 
     const { agents } = await c.var.erc8004.GetAgentServices({ id: entityId(agentId) });
     const [agent] = agents;
@@ -275,7 +276,7 @@ export const agentHandlers = new OpenAPIHono<Env>()
     return c.json(result.data);
   })
   .openapi(listAgentFeedbacksRoute, async (c) => {
-    const agentId = c.req.param("agentId");
+    const agentId = c.req.valid("param").agentId.toString();
     const query = c.req.valid("query");
 
     const { agents } = await c.var.erc8004.GetAgentFeedbacks({

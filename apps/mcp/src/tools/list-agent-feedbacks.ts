@@ -1,8 +1,18 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import {
+  listAgentFeedbacksOutputSchema,
+  listAgentFeedbacksParamsSchema,
+  listAgentFeedbacksQuerySchema,
+} from "@spaceobject/api/rpc";
 import { z } from "zod";
 
 import { ApiClient } from "../lib/api";
-import { jsonToolResult } from "../lib/mcp";
+import { errorResult, jsonResult, toolOutputSchema } from "../lib/mcp";
+
+const listAgentFeedbacksInputSchema = z.object({
+  ...listAgentFeedbacksParamsSchema.shape,
+  ...listAgentFeedbacksQuerySchema.shape,
+});
 
 export const registerListAgentFeedbacksTool = (client: ApiClient) => (server: McpServer) => {
   server.registerTool(
@@ -11,22 +21,25 @@ export const registerListAgentFeedbacksTool = (client: ApiClient) => (server: Mc
       title: "List agent feedbacks",
       description:
         "List feedback left for an agent. Each entry has the client address, score, tags, feedback URI, and creation details. Paginate with limit and skip. Errors if the agent does not exist.",
-      inputSchema: {
-        agentId: z.string().describe("Agent id"),
-        limit: z.number().int().positive().max(1000).default(50).describe("Maximum results"),
-        skip: z.number().int().nonnegative().max(5000).default(0).describe("Results to skip"),
-      },
+      inputSchema: listAgentFeedbacksInputSchema,
+      outputSchema: toolOutputSchema(listAgentFeedbacksOutputSchema),
     },
     async (input) => {
       const response = await client.v1.agents[":agentId"].feedbacks.$get({
-        param: { agentId: input.agentId },
+        param: { agentId: input.agentId.toString() },
         query: {
           limit: String(input.limit),
           skip: String(input.skip),
         },
       });
 
-      return jsonToolResult(response);
+      if (!response.ok) {
+        const text = await response.text();
+        return errorResult(text);
+      }
+
+      const json = await response.json();
+      return jsonResult(json);
     },
   );
 };

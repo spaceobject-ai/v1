@@ -1,8 +1,8 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { z } from "zod";
+import { searchAgentsOutputSchema, searchAgentsQuerySchema } from "@spaceobject/api/rpc";
 
 import { ApiClient } from "../lib/api";
-import { jsonToolResult } from "../lib/mcp";
+import { errorResult, jsonResult, toolOutputSchema } from "../lib/mcp";
 
 export const registerSearchAgentsTool = (client: ApiClient) => (server: McpServer) => {
   server.registerTool(
@@ -11,12 +11,8 @@ export const registerSearchAgentsTool = (client: ApiClient) => (server: McpServe
       title: "Search agents",
       description:
         "Search registered agents by text, or list them without a query. Each result includes the agent id, name, description, metadata, feedback count, and owner address. Paginate with limit and skip.",
-      inputSchema: {
-        q: z.string().optional().describe("Text to match against agent profiles"),
-        owner: z.string().optional().describe("Filter by owner address"),
-        limit: z.number().int().positive().max(1000).default(50).describe("Maximum results"),
-        skip: z.number().int().nonnegative().max(5000).default(0).describe("Results to skip"),
-      },
+      inputSchema: searchAgentsQuerySchema,
+      outputSchema: toolOutputSchema(searchAgentsOutputSchema),
     },
     async (input) => {
       const response = await client.v1.agents.$get({
@@ -28,7 +24,13 @@ export const registerSearchAgentsTool = (client: ApiClient) => (server: McpServe
         },
       });
 
-      return jsonToolResult(response);
+      if (!response.ok) {
+        const text = await response.text();
+        return errorResult(text);
+      }
+
+      const json = await response.json();
+      return jsonResult(json);
     },
   );
 };
